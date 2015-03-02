@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html ng-app="ngApp">
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="bower_components/angular/angular.js"></script>
+    <script src="script.js"></script>
+    <script>
+        angular.module('ngApp',[]).controller('StateListController',function($scope,$http){
+            $scope.states = [];
+            for (var prop in states ) {
+                var obj = {};
+                obj.state = states[prop];
+                obj['code'] = prop;
+                $scope.states.push(obj);
+            }
+            $scope.query = '';
+            $http.get('https://api.github.com/search/repositories?q=nodejs')
+                    .success(function(data,status,headers,config){
+                        $scope.data = data;
+                        console.log(data);
+                    });
+
+        });
+
+    </script>
+</head>
+<body ng-controller="StateListController">
+    <input type="text" ng-model="query">
+
+    <ul>
+        <li ng-repeat="state in states | orderBy:'-code' |filter:query">
+            <span>{{state.state}}</span>
+            <span>{{state.code}}</span>
+        </li>
+    </ul>
+    <ul>
+        <li ng-repeat="item in data.items | orderBy:'-open_issues_count'">
+            {{item.full_name}}    {{item.open_issues_count}}
+        </li>
+    </ul>
+</body>
+</html>

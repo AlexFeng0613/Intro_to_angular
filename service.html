@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html ng-app="myApp">
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="bower_components/angular/angular.js"></script>
+    <script src="bower_components/angular-route/angular-route.js"></script>
+    <script>
+
+        angular.module('myApp',['ngRoute']).config(function($routeProvider){
+            $routeProvider.when('/search',{
+                templateUrl:'partials/search.html',
+                controller:'SearchController'
+            }).when('/searchDetail/:id',{
+                templateUrl:'partials/searchDetail.html',
+                controller:'SearchDetailController'
+            }).otherwise({
+                redirectTo:'/search'
+            })
+        }).factory('GithubService',function($http){
+            return {
+                lastQueryTerm:'',
+                data:null,
+                makeCall:function(queryTerm,callback){
+                    var _githubservicedata = this;
+                    $http.get('https://api.github.com/search/repositories?q=' + queryTerm).success(function(data){
+                        _githubservicedata.data = data;
+                        _githubservicedata.lastQueryTerm = queryTerm;
+                        callback(data);
+                    })
+                }
+            }
+        }).controller('SearchController',function(GithubService,$scope){
+            $scope.query = '';
+
+            if(GithubService.data !=='undefined'){
+                $scope.data = GithubService.data;
+                $scope.query = GithubService.lastQueryTerm;
+            }
+
+            $scope.makeCall = function(event){
+                if(event.keyCode === 13){
+                    GithubService.makeCall($scope.query,function(data){
+                        $scope.data = data;
+
+                    })
+                }
+            }
+        }).controller('SearchDetailController',function(GithubService,$scope,$routeParams){
+            console.log($routeParams.id);
+
+            /*for(var i = 0, len = GithubService.data.items.length;i < len; i++){
+                console.log(GithubService.data.items[i].id);
+                if(GithubService.data.items[i].id == $routeParams.id){
+                    $scope.repo = GithubService.data.items[i];
+                    console.log($scope.repo);
+                }
+            }*/
+
+        });
+    </script>
+</head>
+<body>
+
+    <div ng-view=""></div>
+</body>
+</html>

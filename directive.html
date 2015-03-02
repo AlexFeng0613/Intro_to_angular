@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html ng-app="myApp">
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="bower_components/angular/angular.js"></script>
+    <script>
+        var myApp = angular.module('myApp',[]).directive('hello',function(){
+            return {
+                replace:true,
+                restrict:'AEC',
+                templateUrl:'template.html'
+            }
+        });
+    </script>
+</head>
+<body>
+    <hello></hello>
+    <hello></hello>
+    <hello></hello>
+</body>
+</html>

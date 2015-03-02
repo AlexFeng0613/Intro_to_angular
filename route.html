@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html ng-app="countyApp">
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="bower_components/angular/angular.js"></script>
+    <script src="bower_components/angular-route/angular-route.js"></script>
+    <script>
+
+        var countyApp = angular.module('countyApp',['ngRoute']);
+
+        countyApp.config(function ($routeProvider) {
+
+            $routeProvider.when('/countylist', {
+                templateUrl: 'partials/county-list.html',
+                controller: 'CountyListController'
+            }).when('/countydetail/:countyname', {
+                templateUrl: 'partials/county-detail.html',
+                controller: 'CountyDetailController'
+            }).otherwise({
+                redirectTo: '/countylist'
+            });
+        });
+
+        countyApp.controller('CountyListController', function ($scope,$http) {
+            $http.get('https://api.github.com/search/repositories?q=' + searchContent)
+                    .success(function(data,status,headers,config){
+                        $scope.items = data.items;
+                        console.log(data.items);
+                    });
+
+        }).controller('CountyDetailController', function ($scope, $routeParams) {
+            $scope.countyname = $routeParams.countyname;
+        });
+
+        document.addEventListener('DOMContentLoaded',function(){
+            document.getElementById('submit').addEventListener('click',function(){
+                var searchContent = document.getElementById('search').value;
+
+
+            });
+
+        })
+
+    </script>
+</head>
+<body>
+    <input type="text" name="search" id="search">
+    <button id="submit">Submit</button>
+    <div ng-view></div>
+</body>
+</html>

@@ -1,0 +1,12 @@
+
+  501  bower init
+  502  bower install angular --save
+  503  bower install angular-route --save
+  504  git init
+  505  git add.
+  506  git add .
+  507  git commit -m 'First draft'
+  508  git remote add origin git@github.com:df1163/Intro_to_angular.git
+  509  git push origin master
+  510  history
+  511  history > commands.txt
