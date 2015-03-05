@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html ng-app="myApp">
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+
+    <script src="bower_components/angular/angular.js"></script>
+    <script>
+        angular.module('myApp',[]).controller('MyController',function($scope){
+            $scope.message = 'Hello World!';
+        }).controller('FilterController', function(filterFilter) {
+                    this.array = [
+                        {name: 'Tobias'},
+                        {name: 'Jeff'},
+                        {name: 'Brian'},
+                        {name: 'Igor'},
+                        {name: 'James'},
+                        {name: 'Brad'}
+                    ];
+                    this.filteredArray = filterFilter(this.array, 'a');
+        }).factory('currencyService',function($http){
+
+            var YAHOO_FINANCE_URL_PATTERN =
+                    '//query.yahooapis.com/v1/public/yql?q=select * from '+
+                    'yahoo.finance.xchange where pair in ("PAIRS")&format=json&'+
+                    'env=store://datatables.org/alltableswithkeys&callback=JSON_CALLBACK';
+            var currencies = ['USD', 'EUR', 'CNY'];
+            var usdToForeignRates = {};
+
+            var convert = function (amount, inCurr, outCurr) {
+                return amount * usdToForeignRates[outCurr] / usdToForeignRates[inCurr];
+            };
+
+            var refresh = function() {
+                var url = YAHOO_FINANCE_URL_PATTERN.
+                        replace('PAIRS', 'USD' + currencies.join('","USD'));
+                return $http.jsonp(url).success(function(data) {
+                    var newUsdToForeignRates = {};
+                    angular.forEach(data.query.results.rate, function(rate) {
+                        var currency = rate.id.substring(3,6);
+                        newUsdToForeignRates[currency] = window.parseFloat(rate.Rate);
+                    });
+                    usdToForeignRates = newUsdToForeignRates;
+                });
+            };
+
+            refresh();
+
+            return {
+                currencies: currencies,
+                convert: convert,
+                refresh: refresh
+            };
+
+        }).controller('InvoiceController',function(currencyService){
+            this.qty = 1;
+            this.cost = 1;
+            this.inCur = 'EUR';
+            this.currencies = currencyService.currencies;
+
+            this.total = function(outCur){
+                currencyService.convert(this.qty * this.cost,this.inCur,outCur);
+            }
+        }).filter('pageFilter',function(){
+            return function(input,start){
+                return input.slice(start);
+            }
+        });
+
+    </script>
+</head>
+<body>
+    <!--<div ng-controller="FilterController as ctrl">
+        <div>
+            All entries:
+            <span ng-repeat="entry in ctrl.array">{{entry.name}} </span>
+        </div>
+        <div>
+            Entries that contain an "a":
+            <span ng-repeat="entry in ctrl.filteredArray">{{entry.name}} </span>
+        </div>
+    </div>
+
+    <hr>
+
+    <div ng-init="friends = [{name:'John', phone:'555-1276'}, {name:'Mary', phone:'800-BIG-MARY'}, {name:'Mike', phone:'555-4321'}, {name:'Adam', phone:'555-5678'}, {name:'Julie', phone:'555-8765'}, {name:'Juliette', phone:'555-5678'}]"></div>
+
+    Search: <input ng-model="searchText">
+    <table id="searchTextResults">
+        <tr><th>Name</th><th>Phone</th></tr>
+        <tr ng-repeat="friend in friends | filter:searchText">
+            <td>{{friend.name}}</td>
+            <td>{{friend.phone}}</td>
+        </tr>
+    </table>
+    <hr>
+    <hr>
+    <hr>
+    <hr>
+    Any: <input ng-model="search.$"> <br>
+    Name only <input ng-model="search.name"><br>
+    Phone only <input ng-model="search.phone"><br>
+    Equality <input type="checkbox" ng-model="strict"><br>
+    <table id="searchObjResults">
+        <tr><th>Name</th><th>Phone</th></tr>
+        <tr ng-repeat="friendObj in friends | filter:search:strict">
+            <td>{{friendObj.name}}</td>
+            <td>{{friendObj.phone}}</td>
+        </tr>
+    </table>
+    <hr>
+    <hr>
+    <hr>
+    <hr>-->
+
+    <div ng-controller="InvoiceController as invoice" ng-init="test=[1,2,3,4,5,6,7,8,9,10,11,12]">
+        <h4>Invoice:</h4>
+        <div>
+            <label>Quantity:</label>
+            <input type="number" ng-model="invoice.qty" min="0" required="">
+        </div>
+        <div>
+            <label>Costs:</label>
+            <input type="number" ng-model="invoice.cost" min="0" required="">
+            <select ng-model="invoice.inCur">
+                <option ng-repeat="rate in invoice.currencies">{{rate}}</option>
+            </select>
+        </div>
+        <div>
+            <b>Total:</b>
+            <span ng-repeat="curr in invoice.currencies">{{invoice.total(curr) | currency:curr+'->'}};     </span>
+        </div>
+        <span>{{198.21312 | number:2}}</span>
+        <div>
+            <ul>
+                <li ng-repeat="num in test | pageFilter:3">{{num}}</li>
+            </ul>
+        </div>
+
+    </div>
+</body>
+</html>

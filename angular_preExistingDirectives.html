@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html ng-app="myApp">
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <style>
+        .strike {
+            text-decoration: line-through;
+        }
+        .bold {
+            font-weight: bold;
+        }
+        .red {
+            color: red;
+        }
+
+
+        /* ng-show & ng-hide*/
+        .animate-hide {
+            -webkit-transition: all linear 0.5s;
+            transition: all linear 0.5s;
+            line-height: 20px;
+            opacity: 1;
+            padding: 10px;
+            border: 1px solid black;
+            background: white;
+        }
+
+        .animate-hide.ng-hide {
+            line-height: 0;
+            opacity: 0;
+            padding: 0 10px;
+        }
+
+        .check-element {
+            padding: 10px;
+            border: 1px solid black;
+            background: white;
+        }
+
+
+        /* ng-if */
+        .animate-if {
+            background:white;
+            border:1px solid black;
+            padding:10px;
+        }
+
+        .animate-if.ng-enter, .animate-if.ng-leave {
+            -webkit-transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.5s;
+            transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.5s;
+        }
+
+        .animate-if.ng-enter,
+        .animate-if.ng-leave.ng-leave-active {
+            opacity:0;
+        }
+
+        .animate-if.ng-leave,
+        .animate-if.ng-enter.ng-enter-active {
+            opacity:1;
+        }
+
+        /* ng-include */
+        .slide-animate-container {
+            position:relative;
+            background:white;
+            border:1px solid black;
+            height:40px;
+            overflow:hidden;
+        }
+    </style>
+
+    <script src="bower_components/angular/angular.js"></script>
+    <script src="bower_components/angular-animate/angular-animate.js"></script>
+    <script>
+
+        angular.module('myApp',['ngAnimate']).controller('angularBindController',function($scope){
+            $scope.name = 'Alex';
+        }).controller('angularIncludeController',function($scope){
+
+            $scope.templates = [
+                {name: 'template1.html', url: 'template1.html'},
+                {name: 'template2.html', url: 'template2.html'}
+            ];
+
+            $scope.template = $scope.templates[0];
+        }).controller('angularInitController',function($scope){
+            $scope.list = [['a','b'],['c','d']];
+        });
+
+    </script>
+</head>
+<body>
+    <div ng-controller="angularBindController">
+        <input type="text" ng-model="name">
+        Hello <span ng-bind="name"></span>
+    </div>
+    <div>
+        Check me to check both:
+        <input type="checkbox" ng-model="master"><br/>
+        <input id="checkSlave" type="checkbox" ng-checked="master">
+    </div>
+
+    <p ng-class="{strike: deleted, bold: important, red: error}">Map Syntax Example</p>
+    <input type="checkbox" ng-model="deleted"> deleted (apply "strike" class)<br>
+    <input type="checkbox" ng-model="important"> important (apply "bold" class)<br>
+    <input type="checkbox" ng-model="error"> error (apply "red" class)
+    <hr>
+    <p ng-class="style">Using String Syntax</p>
+    <input type="text" ng-model="style" placeholder="Type: bold strike red">
+    <hr>
+    <p ng-class="[style1, style2, style3]">Using Array Syntax</p>
+    <input ng-model="style1" placeholder="Type: bold, strike or red"><br>
+    <input ng-model="style2" placeholder="Type: bold, strike or red"><br>
+    <input ng-model="style3" placeholder="Type: bold, strike or red"><br>
+
+
+
+
+    Click me: <input type="checkbox" ng-model="checked"><br/>
+    <div>
+        Show:
+        <div class="check-element animate-hide" ng-show="checked">
+            I show up when your checkbox is checked.
+        </div>
+    </div>
+    <div>
+        Hide:
+        <div class="check-element animate-hide" ng-hide="checked">
+            I hide when your checkbox is checked.
+        </div>
+    </div>
+
+
+
+
+    Click me: <input type="checkbox" ng-model="checked" ng-init="checked=true" /><br/>
+    Show when checked:
+    <span ng-if="checked" class="animate-if">
+      This is removed when the checkbox is unchecked.
+    </span>
+
+    <br>
+    <br>
+    <br>
+    <div ng-controller="angularIncludeController">
+        <select ng-model="template" ng-options="t.name for t in templates">
+            <option value="">(blank)</option>
+        </select>
+        url of the template:<code>{{template.url}}</code>
+        <hr>
+        <div class="slide-animate-container">
+            <div class="slide-animate" ng-include="template.url">
+
+            </div>
+        </div>
+    </div>
+
+
+    <br>
+    <br>
+    <br>
+    <div ng-controller="angularInitController">
+        <div ng-repeat="innerList in list" ng-init="outerIndex=$index">
+            <div ng-repeat="value in innerList" ng-init="innerIndex=$index">
+                list[{{outerIndex}}][{{innerIndex}}] = {{value}};
+            </div>
+        </div>
+    </div>
+</body>
+</html>

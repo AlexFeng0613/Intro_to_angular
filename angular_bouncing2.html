@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html ng-app="myApp">
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css">
+
+    <link href="bower_components/jquery/dist/jquery.js">
+    <style>
+        #container{
+            border: 1px solid red;
+            left: 300px;
+            position: relative;
+            height: 100px;
+        }
+
+        #animation {
+            width: 100px;
+            height: 100px;
+            background: red;
+            position :absolute;
+            animation: bounce 5s infinite;
+        }
+
+    </style>
+    <script src="bower_components/angular/angular.js"></script>
+    <script>
+        angular.module('myApp',[]).controller('MyController',function($scope){
+            $scope.message = 'Hello World!';
+        }).directive('anim',function(){
+            return {
+                compile:function(tElement, tAttrs, transclude){
+                    return{
+                        pre:function(){},
+                        post:function(scope,elem,attrs,controller){
+                            /*console.log('Hello world');
+                            console.log(tElement[0].attributes);
+                            console.log(attrs.maxX);
+                            console.log(attrs.minX);
+                            console.log(attrs.type);
+                            console.log(attrs.width);*/
+                            //console.log(elem[0].style.animate(animations));
+                            var animations = '@keyframes bounce {' +
+                                '0%{left:' + attrs.minX + 'px;}' +
+                                '33%{left:' + attrs.maxX + 'px;}' +
+                                '66%{left:'+ attrs.minX + 'px}' +
+                                '100%{left:'+ attrs.maxX + 'px;}' +
+                                '}';
+                            //console.log(animations);
+                            document.styleSheets[0].insertRule(animations,1);
+                            console.log(document.styleSheets[0]);
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</head>
+<body>
+    <div ng-controller="MyController">
+        {{message}}
+    </div>
+
+    <div id="container">
+        <div id="animation" data-anim data-max-x="300" data-min-x="200" data-type="square" data-width="100"></div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-md-4">.col-md-4</div>
+        <div class="col-md-4 col-md-offset-4">.col-md-4 .col-md-offset-4</div>
+    </div>
+    <div class="row">
+        <div class="col-md-3 col-md-offset-3">.col-md-3 .col-md-offset-3</div>
+        <div class="col-md-3 col-md-offset-3">.col-md-3 .col-md-offset-3</div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3">.col-md-6 .col-md-offset-3</div>
+    </div>
+</body>
+</html>
